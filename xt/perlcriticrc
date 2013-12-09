@@ -28,8 +28,7 @@ max_mccabe = 40
 
 [-Subroutines::ProhibitSubroutinePrototypes]
 
-[Subroutines::RequireArgUnpacking]
-short_subroutine_statements = 2
+[-Subroutines::RequireArgUnpacking]
 
 [-Subroutines::RequireFinalReturn]
 
@@ -46,3 +45,5 @@ statements = 12
 
 [Variables::ProhibitReusedNames]
 allow = $self
+
+[-Variables::ProtectPrivateVars]
