@@ -40,7 +40,9 @@ use base 'AnyEvent::DNS';
 
 use AnyEvent ();
 use AnyEvent::Socket ();
-use Data::Dumper;
+
+use constant DEBUG => $ENV{PERL_ANYEVENT_DNS_ETCHOSTS_DEBUG};
+use if DEBUG, 'Data::Dumper';
 
 
 =head1 METHODS
@@ -152,7 +154,7 @@ sub _load_hosts_unless(&$@) {
 
 sub request {
     my ($self, $req, $cb) = @_;
-    warn "req = ". Dumper $req if $ENV{DEBUG};
+    warn "req = ". Dumper $req if DEBUG;
 
     my $node = my $domain = $req->{qd}[0][0];
     $node =~ s/^_[a-z0-9-]*\._[a-z0-9-]*\.// if ($req->{qd}[0][1] eq 'srv');
@@ -193,14 +195,14 @@ sub request {
             ar => [],
         };
 
-        warn "res = ". Dumper $res if $ENV{DEBUG};
+        warn "res = ". Dumper $res if DEBUG;
 
         return $cb->($res);
     }
 
     return $self->SUPER::request($req, sub {
         my ($res) = @_;
-        warn "SUPER::request res = ". Dumper $res if $ENV{DEBUG};
+        warn "SUPER::request res = ". Dumper $res if DEBUG;
         $cb->($res);
     });
 }
