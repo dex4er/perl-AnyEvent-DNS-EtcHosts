@@ -8,8 +8,6 @@ AnyEvent::DNS::EtcHosts - Use /etc/hosts before DNS
 
   use AnyEvent::DNS::EtcHosts;
 
-  my $guard = AnyEvent::DNS::EtcHosts->register;
-
   use AnyEvent::DNS;
   my $cv = AE::cv;
   AnyEvent::DNS::any 'example.com', sub {
@@ -61,11 +59,56 @@ use constant DEBUG => $ENV{PERL_ANYEVENT_DNS_ETCHOSTS_DEBUG};
 use if DEBUG, 'Data::Dumper';
 
 
+our $GUARD;
+
+
+=head1 IMPORTS
+
+=head2 use AnyEvent::DNS::EtcHosts %args;
+
+  use AnyEvent::DNS::EtcHosts server => '8.8.8.8';
+
+  $ perl -MAnyEvent::DNS::EtcHosts script.pl
+
+Enables this module globally. Additional arguments will be passed to
+L<AnyEvent::DNS> constructor.
+
+=cut
+
+sub import {
+    my ($class, %args) = @_;
+    $GUARD = $class->register(%args);
+}
+
+
+=head2 no AnyEvent::DNS::EtcHosts;
+
+Disables this module globally.
+
+=cut
+
+sub unimport {
+    my ($class) = @_;
+    undef $GUARD;
+}
+
+
 =head1 METHODS
 
 =head2 register
 
-  $guard = AnyEvent::DNS::EtcHosts->register;
+  require AnyEvent::DNS::EtcHosts;
+
+  $guard = AnyEvent::DNS::EtcHosts->register(%args);
+
+  undef $guard;
+
+Enables this module in lexical scope. The module will be disabled out of
+scope. Additional arguments will be passed to L<AnyEvent::DNS> constructor.
+
+If you want to use AnyEvent::DNS::EtcHosts in lexical scope only, you should
+use C<require> rather than C<use> keyword, because C<import> method enables
+AnyEvent::DNS::EtcHosts globally.
 
 =cut
 
@@ -78,7 +121,9 @@ sub register {
     );
 
     # Overwrite original helper function only if exists
-    my $old_helper = eval { \&AnyEvent::Socket::_load_hosts_unless };
+    my $old_helper = ((prototype 'AnyEvent::Socket::_load_hosts_unless')||'') eq '&$@'
+                   ? \&AnyEvent::Socket::_load_hosts_unless
+                   : undef;
 
     eval {
         no warnings 'redefine';
@@ -88,19 +133,13 @@ sub register {
         };
     } if $old_helper;
 
-    AnyEvent::Util::guard {
+    return AnyEvent::Util::guard {
         $AnyEvent::DNS::RESOLVER = $old_resolver;
         no warnings 'redefine';
         *AnyEvent::Socket::_load_hosts_unless = $old_helper if $old_helper;
     };
 }
 
-
-=head2 request
-
-  $resolver->request($req, $cb->($res))
-
-=cut
 
 # Helper functions taken from AnyEvent::Socket 7.05
 
@@ -168,6 +207,15 @@ sub _load_hosts_unless(&$@) {
       }
    }
 }
+
+
+=head2 request
+
+  $resolver->request($req, $cb->($res))
+
+This is wrapper for L<AnyEvent::DNS>->request method.
+
+=cut
 
 sub request {
     my ($self, $req, $cb) = @_;

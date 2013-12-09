@@ -19,14 +19,16 @@ use File::Temp 'tempfile';
 my ($fh, $filename) = tempfile(TMPDIR => 1);
 ok $filename;
 
-say $fh '1.2.3.4 example.com';
-say $fh '5.6.7.8 example.com';
-say $fh 'fe00::1234 example.com';
+print { $fh } << 'END';
+1.2.3.4 example.com
+5.6.7.8 example.com
+fe00::1234 example.com
+END
 close $fh;
 
 $ENV{PERL_ANYEVENT_HOSTS} = $filename;
 
-use AnyEvent::DNS::EtcHosts;
+require AnyEvent::DNS::EtcHosts;
 
 my $guard = AnyEvent::DNS::EtcHosts->register;
 ok $guard;

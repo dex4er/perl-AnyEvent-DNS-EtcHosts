@@ -9,9 +9,6 @@ use lib 'lib', '../lib';
 my $domain = $ARGV[0] || 'example.com';
 
 use AnyEvent::DNS::EtcHosts;
-
-my $guard = AnyEvent::DNS::EtcHosts->register;
-
 use AnyEvent::DNS;
 
 my $cv = AE::cv;

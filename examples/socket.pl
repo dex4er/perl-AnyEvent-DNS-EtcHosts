@@ -12,9 +12,6 @@ my $proto   = $ARGV[2] || 'tcp';
 my $family  = $ARGV[3] || 0;
 
 use AnyEvent::DNS::EtcHosts;
-
-my $guard = AnyEvent::DNS::EtcHosts->register;
-
 use AnyEvent::Socket;
 use Socket;
 

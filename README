@@ -3,13 +3,18 @@ NAME
 
 SYNOPSIS
       use AnyEvent::DNS::EtcHosts;
+
       use AnyEvent::DNS;
-
-      my $guard = AnyEvent::DNS::EtcHosts->register;
       my $cv = AE::cv;
-
       AnyEvent::DNS::any 'example.com', sub {
           say foreach map { $_->[4] } grep { $_->[1] =~ /^(a|aaaa)$/ } @_;
+          $cv->send;
+      };
+
+      use AnyEvent::Socket;
+      my $cv = AE::cv;
+      AnyEvent::Socket::resolve_sockaddr $domain, $service, $proto, $family, undef, sub {
+          say foreach map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_;
           $cv->send;
       };
 
@@ -17,13 +22,24 @@ DESCRIPTION
     AnyEvent::DNS::EtcHosts changes AnyEvent::DNS behavior. The /etc/hosts
     file is searched before DNS, so it is possible to override DNS entries.
 
-    The DNS lookup are emulated so this resolver returns the standard DNS
+    The DNS lookups are emulated. This resolver returns the standard DNS
     reply based on /etc/hosts file rather than real DNS.
+
+    You can choose different file by changing `PERL_ANYEVENT_HOSTS'
+    environment variable.
+
+    This module also disables original AnyEvent::Socket's helper function
+    which reads /etc/hosts file after DNS entry was not found. It prevents
+    to read this file twice.
 
 SEE ALSO
     AnyEvent::DNS, AnyEvent::Socket.
 
 BUGS
+    This module uses private functions and variables of AnyEvent::Socket
+    package. It might be incompatible with further versions of AnyEvent
+    module.
+
     If you find the bug or want to implement new features, please report it
     at https://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts/issues
 
