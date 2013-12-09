@@ -141,22 +141,24 @@ sub request {
     my ($self, $req, $cb) = @_;
     warn "req = ". Dumper $req if $ENV{DEBUG};
 
-    my $domain = $req->{qd}[0][0];
-    $domain =~ s/^_[a-z0-9-]*\._[a-z0-9-]*\.// if ($req->{qd}[0][1] eq 'srv');
+    my $node = my $domain = $req->{qd}[0][0];
+    $node =~ s/^_[a-z0-9-]*\._[a-z0-9-]*\.// if ($req->{qd}[0][1] eq 'srv');
 
     my $type = $req->{qd}[0][1];
 
-    my (@ipv4, @ipv6);
+    my (@ipv4, @ipv6, @srv);
 
     my $cv = AE::cv;
     _load_hosts_unless {
-        eval { push @ipv4, @{ ($HOSTS{$domain})->[0] } }
-            if $type =~ /^([*]|srv|a)$/;
-        eval { push @ipv6, @{ ($HOSTS{$domain})->[1] } }
-            if $type =~ /^([*]|srv|aaaa)$/;
+        push @srv, $node
+            if $type =~ /^([*]|srv)$/ and exists $HOSTS{$node};
+        eval { push @ipv4, @{ ($HOSTS{$node})->[0] } }
+            if $type =~ /^([*]|a)$/;
+        eval { push @ipv6, @{ ($HOSTS{$node})->[1] } }
+            if $type =~ /^([*]|aaaa)$/;
     } $cv;
 
-    if (@ipv4 or @ipv6) {
+    if (@ipv4 or @ipv6 or @srv) {
         my $res = {
             id => int rand(0xffff),
             op => 'query',
@@ -170,8 +172,9 @@ sub request {
             cd => '',
             qd => $req->{qd},
             an => [
-                (map { [ $domain, 'a', 'in', 0, AnyEvent::Socket::format_ipv4 $_ ] } @ipv4),
-                (map { [ $domain, 'aaaa', 'in', 0, AnyEvent::Socket::format_ipv6 $_ ] } @ipv6),
+                (map { [ $domain, 'srv', 'in', 0, 0, 0, 0, $_ ] } @srv),
+                (map { [ $node, 'a', 'in', 0, AnyEvent::Socket::format_ipv4 $_ ] } @ipv4),
+                (map { [ $node, 'aaaa', 'in', 0, AnyEvent::Socket::format_ipv6 $_ ] } @ipv6),
             ],
             ns => [],
             ar => [],
