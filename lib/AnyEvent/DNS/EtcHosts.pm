@@ -12,8 +12,8 @@ AnyEvent::DNS::EtcHosts - Use /etc/hosts before DNS
   my $guard = AnyEvent::DNS::EtcHosts->register;
   my $cv = AE::cv;
 
-  AnyEvent::DNS::any $domain, sub {
-      say foreach map { $_->[4] } @_;
+  AnyEvent::DNS::any 'example.com', sub {
+      say foreach map { $_->[4] } grep { $_->[1] =~ /^(a|aaaa)$/ } @_;
       $cv->send;
   };
 
