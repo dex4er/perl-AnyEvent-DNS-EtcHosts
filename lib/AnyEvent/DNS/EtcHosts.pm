@@ -61,6 +61,7 @@ sub register {
         %args
     );
 
+    # Overwrite original helper function only if exists
     my $old_helper = eval { \&AnyEvent::Socket::_load_hosts_unless };
 
     eval {
@@ -85,7 +86,7 @@ sub register {
 
 =cut
 
-# Helper functions taken from AnyEvent::Socket
+# Helper functions taken from AnyEvent::Socket 7.05
 
 our %HOSTS;          # $HOSTS{$nodename}[$ipv6] = [@aliases...]
 our @HOSTS_CHECKING; # callbacks to call when hosts have been loaded
