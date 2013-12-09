@@ -22,22 +22,15 @@ DESCRIPTION
     The DNS lookup are emulated so this resolver returns the standard DNS
     reply based on /etc/hosts file rather than real DNS.
 
-METHODS
-  register
-      $guard = AnyEvent::DNS::EtcHosts->register;
-
-  request
-      $resolver->request($req, $cb->($res))
-
 SEE ALSO
     AnyEvent::DNS, AnyEvent::Socket.
 
 BUGS
     If you find the bug or want to implement new features, please report it
-    at <https://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts/issues>
+    at https://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts/issues
 
     The code repository is available at
-    <http://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts>
+    http://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts
 
 AUTHOR
     Piotr Roszatycki <dexter@cpan.org>
@@ -48,5 +41,5 @@ LICENSE
     This is free software; you can redistribute it and/or modify it under
     the same terms as perl itself.
 
-    See <http://dev.perl.org/licenses/artistic.html>
+    See http://dev.perl.org/licenses/artistic.html
 

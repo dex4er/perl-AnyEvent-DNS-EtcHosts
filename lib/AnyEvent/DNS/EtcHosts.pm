@@ -63,6 +63,8 @@ sub register {
     AnyEvent::Util::guard {
         $AnyEvent::DNS::RESOLVER = $old;
     };
+
+    return;
 }
 
 
