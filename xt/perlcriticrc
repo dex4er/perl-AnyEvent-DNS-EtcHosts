@@ -31,6 +31,8 @@ max_mccabe = 40
 [Subroutines::RequireArgUnpacking]
 short_subroutine_statements = 2
 
+[-Subroutines::RequireFinalReturn]
+
 [TestingAndDebugging::ProhibitNoStrict]
 allow = vars subs refs
 

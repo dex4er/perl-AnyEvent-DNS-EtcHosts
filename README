@@ -13,8 +13,6 @@ SYNOPSIS
           $cv->send;
       };
 
-    undef $guard;
-
 DESCRIPTION
     AnyEvent::DNS::EtcHosts changes AnyEvent::DNS behavior. The /etc/hosts
     file is searched before DNS, so it is possible to override DNS entries.

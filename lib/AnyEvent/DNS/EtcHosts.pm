@@ -17,8 +17,6 @@ AnyEvent::DNS::EtcHosts - Use /etc/hosts before DNS
       $cv->send;
   };
 
-undef $guard;
-
 =head1 DESCRIPTION
 
 AnyEvent::DNS::EtcHosts changes AnyEvent::DNS behavior. The F</etc/hosts> file
@@ -63,8 +61,6 @@ sub register {
     AnyEvent::Util::guard {
         $AnyEvent::DNS::RESOLVER = $old;
     };
-
-    return;
 }
 
 
@@ -73,7 +69,6 @@ sub register {
   $resolver->request($req, $cb->($res))
 
 =cut
-
 
 sub request {
     my ($self, $req, $cb) = @_;
@@ -87,7 +82,7 @@ sub request {
     my (@ipv4, @ipv6);
 
     my $cv = AE::cv;
-    AnyEvent::Socket::_load_hosts_unless {
+    _load_hosts_unless {
         eval { push @ipv4, @{ ($AnyEvent::Socket::HOSTS{$domain})->[0] } }
             if $type =~ /^([*]|srv|a)$/;
         eval { push @ipv6, @{ ($AnyEvent::Socket::HOSTS{$domain})->[1] } }
@@ -126,6 +121,74 @@ sub request {
         $cb->($res);
     });
 }
+
+# Helper functions taken from AnyEvent::Socket
+
+our %HOSTS;          # $HOSTS{$nodename}[$ipv6] = [@aliases...]
+our @HOSTS_CHECKING; # callbacks to call when hosts have been loaded
+our $HOSTS_MTIME;
+
+sub _parse_hosts($) {
+   %HOSTS = ();
+
+   for (split /\n/, $_[0]) {
+      s/#.*$//;
+      s/^[ \t]+//;
+      y/A-Z/a-z/;
+
+      my ($addr, @aliases) = split /[ \t]+/;
+      next unless @aliases;
+
+      if (my $ip = parse_ipv4 $addr) {
+         ($ip) = $ip =~ /^(.*)$/s if AnyEvent::TAINT;
+         push @{ $HOSTS{$_}[0] }, $ip
+            for @aliases;
+      } elsif ($ip = parse_ipv6 $addr) {
+         ($ip) = $ip =~ /^(.*)$/s if AnyEvent::TAINT;
+         push @{ $HOSTS{$_}[1] }, $ip
+            for @aliases;
+      }
+   }
+}
+
+# helper function - unless dns delivered results, check and parse hosts, then call continuation code
+sub _load_hosts_unless(&$@) {
+   my ($cont, $cv, @dns) = @_;
+
+   if (@dns) {
+      $cv->end;
+   } else {
+      my $etc_hosts = length $ENV{PERL_ANYEVENT_HOSTS} ? $ENV{PERL_ANYEVENT_HOSTS}
+                      : AnyEvent::WIN32                ? "$ENV{SystemRoot}/system32/drivers/etc/hosts"
+                      :                                  "/etc/hosts";
+
+      push @HOSTS_CHECKING, sub {
+         $cont->();
+         $cv->end;
+      };
+
+      unless ($#HOSTS_CHECKING) {
+         # we are not the first, so we actually have to do the work
+         require AnyEvent::IO;
+
+         AnyEvent::IO::aio_stat ($etc_hosts, sub {
+            if ((stat _)[9] ne $HOSTS_MTIME) {
+               AE::log 8 => "(re)loading $etc_hosts.";
+               $HOSTS_MTIME = (stat _)[9];
+               # we might load a newer version of hosts,but that's a harmless race,
+               # as the next call will just load it again.
+               AnyEvent::IO::aio_load ($etc_hosts, sub {
+                  _parse_hosts $_[0];
+                  (shift @HOSTS_CHECKING)->() while @HOSTS_CHECKING;
+               });
+            } else {
+               (shift @HOSTS_CHECKING)->() while @HOSTS_CHECKING;
+            }
+         });
+      }
+   }
+}
+
 
 1;
 

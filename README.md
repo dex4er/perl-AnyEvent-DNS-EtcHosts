@@ -15,8 +15,6 @@ AnyEvent::DNS::EtcHosts - Use /etc/hosts before DNS
         $cv->send;
     };
 
-undef $guard;
-
 # DESCRIPTION
 
 AnyEvent::DNS::EtcHosts changes AnyEvent::DNS behavior. The `/etc/hosts` file
