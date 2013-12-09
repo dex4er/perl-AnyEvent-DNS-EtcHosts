@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# Example: dns.pl google.com
+
 use v5.14;
 
 use lib 'lib', '../lib';
@@ -20,5 +22,3 @@ AnyEvent::DNS::any $domain, sub {
 };
 
 $cv->recv;
-
-undef $guard;
