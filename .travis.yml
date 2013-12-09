@@ -9,3 +9,6 @@ script: ./Dist.SH
 perl:
   - 5.8
   - 5.18
+branch:
+  only:
+    - master

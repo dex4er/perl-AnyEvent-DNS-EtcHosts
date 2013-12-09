@@ -7,13 +7,20 @@ AnyEvent::DNS::EtcHosts - Use /etc/hosts before DNS
 =head1 SYNOPSIS
 
   use AnyEvent::DNS::EtcHosts;
-  use AnyEvent::DNS;
 
   my $guard = AnyEvent::DNS::EtcHosts->register;
-  my $cv = AE::cv;
 
+  use AnyEvent::DNS;
+  my $cv = AE::cv;
   AnyEvent::DNS::any 'example.com', sub {
       say foreach map { $_->[4] } grep { $_->[1] =~ /^(a|aaaa)$/ } @_;
+      $cv->send;
+  };
+
+  use AnyEvent::Socket;
+  my $cv = AE::cv;
+  AnyEvent::Socket::resolve_sockaddr $domain, $service, $proto, $family, undef, sub {
+      say foreach map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_;
       $cv->send;
   };
 
@@ -22,8 +29,17 @@ AnyEvent::DNS::EtcHosts - Use /etc/hosts before DNS
 AnyEvent::DNS::EtcHosts changes AnyEvent::DNS behavior. The F</etc/hosts> file
 is searched before DNS, so it is possible to override DNS entries.
 
-The DNS lookup are emulated so this resolver returns the standard DNS reply
+The DNS lookups are emulated. This resolver returns the standard DNS reply
 based on F</etc/hosts> file rather than real DNS.
+
+You can choose different file by changing C<PERL_ANYEVENT_HOSTS> environment
+variable.
+
+This module also disables original L<AnyEvent::Socket>'s helper function which
+reads F</etc/hosts> file after DNS entry was not found. It prevents to read
+this file twice.
+
+
 
 =for readme stop
 
@@ -220,6 +236,9 @@ L<AnyEvent::DNS>,
 L<AnyEvent::Socket>.
 
 =head1 BUGS
+
+This module uses private functions and variables of L<AnyEvent::Socket>
+package. It might be incompatible with further versions of L<AnyEvent> module.
 
 If you find the bug or want to implement new features, please report it at
 L<https://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts/issues>
