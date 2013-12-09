@@ -31,13 +31,13 @@ use AnyEvent::DNS::EtcHosts;
 my $guard = AnyEvent::DNS::EtcHosts->register;
 ok $guard;
 
-use AnyEvent::DNS;
+use AnyEvent::Socket;
 
 {
     ok my $cv = AE::cv;
 
-    AnyEvent::DNS::any 'example.com', sub {
-        cmp_deeply [ map { $_->[4] } grep { $_->[1] =~ /^(a|aaaa)$/ } @_ ],
+    AnyEvent::Socket::resolve_sockaddr 'example.com', 'http', 'tcp', 0, undef, sub {
+        cmp_deeply [ map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_ ],
                    [ qw(1.2.3.4 5.6.7.8 fe00::1234) ];
         $cv->send;
     };
@@ -49,8 +49,21 @@ use AnyEvent::DNS;
 {
     ok my $cv = AE::cv;
 
-    AnyEvent::DNS::a 'example.com', sub {
-        cmp_deeply [ @_ ],
+    AnyEvent::Socket::resolve_sockaddr 'example.com', 80, 'tcp', 0, undef, sub {
+        cmp_deeply [ map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_ ],
+                   [ qw(1.2.3.4 5.6.7.8 fe00::1234) ];
+        $cv->send;
+    };
+
+    $cv->recv;
+    ok 1;
+}
+
+{
+    ok my $cv = AE::cv;
+
+    AnyEvent::Socket::resolve_sockaddr 'example.com', 'http', 'tcp', 4, undef, sub {
+        cmp_deeply [ map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_ ],
                    [ qw(1.2.3.4 5.6.7.8) ];
         $cv->send;
     };
@@ -62,21 +75,9 @@ use AnyEvent::DNS;
 {
     ok my $cv = AE::cv;
 
-    AnyEvent::DNS::aaaa 'example.com', sub {
-        cmp_deeply [ @_ ],
+    AnyEvent::Socket::resolve_sockaddr 'example.com', 'http', 'tcp', 6, undef, sub {
+        cmp_deeply [ map { format_address((AnyEvent::Socket::unpack_sockaddr($_->[3]))[1]) } @_ ],
                    [ qw(fe00::1234) ];
-        $cv->send;
-    };
-
-    $cv->recv;
-    ok 1;
-}
-
-{
-    ok my $cv = AE::cv;
-    AnyEvent::DNS::srv 'http', 'tcp', 'example.com', sub {
-        cmp_deeply [ map { $_->[3] } @_ ],
-                   [ qw(example.com) ];
         $cv->send;
     };
 
