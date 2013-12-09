@@ -19,7 +19,7 @@ my $build = Module::Build->new(
     license                 => 'perl',
     requires                => {
         'perl'                  => 5.008_001,
-        'AnyEvent'              => 7.04,
+        'AnyEvent'              => 4.0,
     },
     build_requires          => {
         'Test::More'            => 0.98,
