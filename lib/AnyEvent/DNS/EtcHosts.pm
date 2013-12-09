@@ -54,12 +54,25 @@ use Data::Dumper;
 sub register {
     my ($class, %args) = @_;
 
-    my $old = $AnyEvent::DNS::RESOLVER;
+    my $old_resolver = $AnyEvent::DNS::RESOLVER;
     $AnyEvent::DNS::RESOLVER = AnyEvent::DNS::EtcHosts->new(
         %args
     );
+
+    my $old_helper = eval { \&AnyEvent::Socket::_load_hosts_unless };
+
+    eval {
+        no warnings 'redefine';
+        *AnyEvent::Socket::_load_hosts_unless = sub (&$@) {
+            my ($cont, $cv, @dns) = @_;
+            $cv->end;
+        };
+    } if $old_helper;
+
     AnyEvent::Util::guard {
-        $AnyEvent::DNS::RESOLVER = $old;
+        $AnyEvent::DNS::RESOLVER = $old_resolver;
+        no warnings 'redefine';
+        *AnyEvent::Socket::_load_hosts_unless = $old_helper if $old_helper;
     };
 }
 
