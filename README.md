@@ -84,8 +84,7 @@ This is wrapper for [AnyEvent::DNS](https://metacpan.org/pod/AnyEvent::DNS)\->re
 
 # BUGS
 
-This module uses private functions and variables of [AnyEvent::Socket](https://metacpan.org/pod/AnyEvent::Socket)
-package. It might be incompatible with further versions of [AnyEvent](https://metacpan.org/pod/AnyEvent) module.
+This module might be incompatible with further versions of [AnyEvent](https://metacpan.org/pod/AnyEvent) module.
 
 If you find the bug or want to implement new features, please report it at
 [https://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts/issues](https://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts/issues)

@@ -36,8 +36,7 @@ SEE ALSO
     AnyEvent::DNS, AnyEvent::Socket.
 
 BUGS
-    This module uses private functions and variables of AnyEvent::Socket
-    package. It might be incompatible with further versions of AnyEvent
+    This module might be incompatible with further versions of AnyEvent
     module.
 
     If you find the bug or want to implement new features, please report it
