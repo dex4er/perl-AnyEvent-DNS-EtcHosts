@@ -125,13 +125,13 @@ sub register {
                    ? \&AnyEvent::Socket::_load_hosts_unless
                    : undef;
 
-    eval {
+    if ($old_helper) {
         no warnings 'redefine';
         *AnyEvent::Socket::_load_hosts_unless = sub (&$@) {
             my ($cont, $cv, @dns) = @_;
             $cv->end;
         };
-    } if $old_helper;
+    }
 
     return AnyEvent::Util::guard {
         $AnyEvent::DNS::RESOLVER = $old_resolver;
@@ -230,12 +230,19 @@ sub request {
 
     my $cv = AE::cv;
     _load_hosts_unless {
-        push @srv, $node
-            if $type =~ /^([*]|srv)$/ and exists $HOSTS{$node};
-        eval { push @ipv4, @{ ($HOSTS{$node})->[0] } }
-            if $type =~ /^([*]|a)$/;
-        eval { push @ipv6, @{ ($HOSTS{$node})->[1] } }
-            if $type =~ /^([*]|aaaa)$/;
+        if (exists $HOSTS{$node}) {
+            if ($type =~ /^([*]|srv)$/) {
+                push @srv, $node
+            }
+            if (ref $HOSTS{$node} eq 'ARRAY') {
+                if ($type =~ /^([*]|a)$/ and exists $HOSTS{$node}[0]) {
+                    push @ipv4, @{ $HOSTS{$node}[0] }
+                }
+                if ($type =~ /^([*]|aaaa)$/ and exists $HOSTS{$node}[1]) {
+                    push @ipv6, @{ $HOSTS{$node}[1] }
+                }
+            }
+        }
     } $cv;
 
     if (@ipv4 or @ipv6 or @srv) {
