@@ -119,9 +119,20 @@ sub register {
     my ($class, %args) = @_;
 
     my $old_resolver = $AnyEvent::DNS::RESOLVER;
-    $AnyEvent::DNS::RESOLVER = AnyEvent::DNS::EtcHosts->new(
-        %args
-    );
+
+    $AnyEvent::DNS::RESOLVER = do {
+        my $resolver = AnyEvent::DNS::EtcHosts->new(
+            untaint         => 1,
+            max_outstanding => $ENV{PERL_ANYEVENT_MAX_OUTSTANDING_DNS} || 1,
+            %args
+        );
+        if (not $args{server}) {
+            $ENV{PERL_ANYEVENT_RESOLV_CONF}
+                ? $resolver->_load_resolv_conf_file($ENV{PERL_ANYEVENT_RESOLV_CONF})
+                : $resolver->os_config;
+        }
+        $resolver;
+    };
 
     # Overwrite original helper function only if exists
     my $old_helper = ((prototype 'AnyEvent::Socket::_load_hosts_unless')||'') eq '&$@'
