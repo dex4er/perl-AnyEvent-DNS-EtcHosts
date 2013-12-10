@@ -135,9 +135,10 @@ sub register {
     };
 
     # Overwrite original helper function only if exists
-    my $old_helper = ((prototype 'AnyEvent::Socket::_load_hosts_unless')||'') eq '&$@'
-                   ? \&AnyEvent::Socket::_load_hosts_unless
-                   : undef;
+    my $old_helper = do {
+        \&AnyEvent::Socket::_load_hosts_unless
+            if ((prototype 'AnyEvent::Socket::_load_hosts_unless')||'') eq '&$@';
+    };
 
     if ($old_helper) {
         no warnings 'redefine';
