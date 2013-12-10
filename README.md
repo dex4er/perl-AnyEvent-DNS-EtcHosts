@@ -35,9 +35,10 @@ This module also disables original [AnyEvent::Socket](https://metacpan.org/pod/A
 reads `/etc/hosts` file after DNS entry was not found. It prevents to read
 this file twice.
 
-
-
-
+The [AnyEvent::Socket](https://metacpan.org/pod/AnyEvent::Socket) resolver searches IPv4 and IPv6 addresses separately.
+If you don't want to check the addresses in DNS, both IPv4 and IPv6 addresses
+should be placed in `/etc/hosts` or protocol family should be set explicitly
+for `resolve_sockaddr` function.
 
 # IMPORTS
 

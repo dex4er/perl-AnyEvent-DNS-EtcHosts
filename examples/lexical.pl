@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Example: socket.pl google.com xmpp-client tcp 4
+# Example: lexical.pl google.com xmpp-client tcp 4
 
 use v5.14;
 
