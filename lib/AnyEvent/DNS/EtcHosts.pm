@@ -285,8 +285,7 @@ L<AnyEvent::Socket>.
 
 =head1 BUGS
 
-This module uses private functions and variables of L<AnyEvent::Socket>
-package. It might be incompatible with further versions of L<AnyEvent> module.
+This module might be incompatible with further versions of L<AnyEvent> module.
 
 If you find the bug or want to implement new features, please report it at
 L<https://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts/issues>
