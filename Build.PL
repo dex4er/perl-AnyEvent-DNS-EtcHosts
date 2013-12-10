@@ -22,6 +22,7 @@ my $build = Module::Build->new(
         'AnyEvent'              => 7.0,
     },
     build_requires          => {
+        'Test::Deep'            => 0,
         'Test::More'            => 0.98,
     },
     auto_configure_requires => 0,
