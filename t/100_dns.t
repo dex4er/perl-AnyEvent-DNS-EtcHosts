@@ -16,7 +16,7 @@ use Test::Deep;
 
 use File::Temp 'tempfile';
 
-my ($fh, $filename) = tempfile(TMPDIR => 1);
+my ($fh, $filename) = tempfile TMPDIR => 1, UNLINK => 1;
 ok $filename;
 
 print { $fh } << 'END';
