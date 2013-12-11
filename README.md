@@ -93,9 +93,12 @@ If you find the bug or want to implement new features, please report it at
 The code repository is available at
 [http://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts](http://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts)
 
-# AUTHOR
+# AUTHORS
 
 Piotr Roszatycki <dexter@cpan.org>
+
+Helper functions taken from AnyEvent::Socket 7.05 by
+Marc Lehmann <schmorp@schmorp.de>
 
 # LICENSE
 

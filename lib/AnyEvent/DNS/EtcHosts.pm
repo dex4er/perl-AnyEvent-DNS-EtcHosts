@@ -51,7 +51,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.0100';
 
 use base 'AnyEvent::DNS';
 
@@ -315,9 +315,12 @@ L<https://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts/issues>
 The code repository is available at
 L<http://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Piotr Roszatycki <dexter@cpan.org>
+
+Helper functions taken from AnyEvent::Socket 7.05 by
+Marc Lehmann <schmorp@schmorp.de>
 
 =head1 LICENSE
 
