@@ -39,7 +39,7 @@ this file twice.
 
 The L<AnyEvent::Socket> resolver searches IPv4 and IPv6 addresses separately.
 If you don't want to check the addresses in DNS, both IPv4 and IPv6 addresses
-should be placed in F</etc/hosts> or one protocol family should be set
+should be placed in F</etc/hosts> or the protocol family should be set
 explicitly for C<resolve_sockaddr> function.
 
 =for readme stop
