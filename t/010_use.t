@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Carp ();
+use Carp 'verbose';
 
 $SIG{__WARN__} = sub { local $Carp::CarpLevel = 1; Carp::confess("Warning: ", @_) };
 
