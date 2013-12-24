@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dex4er/perl-AnyEvent-DNS-EtcHosts.png?branch=master)](https://travis-ci.org/dex4er/perl-AnyEvent-DNS-EtcHosts)
+
 # NAME
 
 AnyEvent::DNS::EtcHosts - Use /etc/hosts before DNS
