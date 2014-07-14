@@ -8,7 +8,7 @@ use lib 'lib', '../lib';
 
 my $domain = $ARGV[0] || 'example.com';
 
-use AnyEvent::DNS::EtcHosts;
+use if $ENV{PERL_ANYEVENT_DNS} eq 'EtcHosts' || ! $ENV{PERL_ANYEVENT_DNS}, 'AnyEvent::DNS::EtcHosts';
 use AnyEvent::DNS;
 
 my $cv = AE::cv;

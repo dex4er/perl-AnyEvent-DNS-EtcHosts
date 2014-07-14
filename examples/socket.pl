@@ -11,7 +11,7 @@ my $service = $ARGV[1] || 80;
 my $proto   = $ARGV[2] || 'tcp';
 my $family  = $ARGV[3] || 0;
 
-use AnyEvent::DNS::EtcHosts;
+use if $ENV{PERL_ANYEVENT_DNS} eq 'EtcHosts' || ! $ENV{PERL_ANYEVENT_DNS}, 'AnyEvent::DNS::EtcHosts';
 use AnyEvent::Socket;
 use Socket;
 
