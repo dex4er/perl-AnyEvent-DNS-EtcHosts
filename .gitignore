@@ -20,7 +20,7 @@ META.json
 META.yml
 MYMETA.json
 MYMETA.yml
-Makefile
+/Makefile
 Makefile.PL
 Makefile.old
 _build
