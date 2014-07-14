@@ -1,6 +1,6 @@
 0.0103  2014-07-14      Piotr Roszatycki <dexter@cpan.org>
 
-*
+* Support AnyEvent::IO::IOAIO (the default on Fedora systems).
 
 0.0102  2013-12-24      Piotr Roszatycki <dexter@cpan.org>
 

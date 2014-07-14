@@ -244,6 +244,8 @@ sub request {
     my (@ipv4, @ipv6, @srv);
 
     my $cv = AE::cv;
+
+    $cv->begin;
     _load_hosts_unless {
         if (exists $HOSTS{$node}) {
             if ($type =~ /^([*]|srv)$/) {
@@ -258,40 +260,43 @@ sub request {
                 }
             }
         }
+
+        if (@ipv4 or @ipv6 or @srv) {
+            my $res = {
+                id => int rand(0xffff),
+                op => 'query',
+                rc => 'noerror',
+                qr => 1,
+                aa => '',
+                tc => '',
+                rd => $req->{rd},
+                ra => 1,
+                ad => '',
+                cd => '',
+                qd => $req->{qd},
+                an => [
+                    (map { [ $domain, 'srv', 'in', 0, 0, 0, 0, $_ ] } @srv),
+                    (map { [ $node, 'a', 'in', 0, AnyEvent::Socket::format_ipv4 $_ ] } @ipv4),
+                    (map { [ $node, 'aaaa', 'in', 0, AnyEvent::Socket::format_ipv6 $_ ] } @ipv6),
+                ],
+                ns => [],
+                ar => [],
+            };
+
+            warn "res = ". Dumper $res if DEBUG;
+
+            return $cb->($res);
+        }
+
+        return $self->SUPER::request($req, sub {
+            my ($res) = @_;
+            warn "SUPER::request res = ". Dumper $res if DEBUG;
+            $cb->($res);
+        });
+
     } $cv;
 
-    if (@ipv4 or @ipv6 or @srv) {
-        my $res = {
-            id => int rand(0xffff),
-            op => 'query',
-            rc => 'noerror',
-            qr => 1,
-            aa => '',
-            tc => '',
-            rd => $req->{rd},
-            ra => 1,
-            ad => '',
-            cd => '',
-            qd => $req->{qd},
-            an => [
-                (map { [ $domain, 'srv', 'in', 0, 0, 0, 0, $_ ] } @srv),
-                (map { [ $node, 'a', 'in', 0, AnyEvent::Socket::format_ipv4 $_ ] } @ipv4),
-                (map { [ $node, 'aaaa', 'in', 0, AnyEvent::Socket::format_ipv6 $_ ] } @ipv6),
-            ],
-            ns => [],
-            ar => [],
-        };
-
-        warn "res = ". Dumper $res if DEBUG;
-
-        return $cb->($res);
-    }
-
-    return $self->SUPER::request($req, sub {
-        my ($res) = @_;
-        warn "SUPER::request res = ". Dumper $res if DEBUG;
-        $cb->($res);
-    });
+    return;
 }
 
 
