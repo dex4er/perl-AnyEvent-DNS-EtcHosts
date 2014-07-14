@@ -173,13 +173,13 @@ sub _parse_hosts($) {
       my ($addr, @aliases) = split /[ \t]+/;
       next unless @aliases;
 
-      if (my $ip = AnyEvent::Socket::parse_ipv4 $addr) {
-         ($ip) = $ip =~ /^(.*)$/s if AnyEvent::TAINT;
-         push @{ $HOSTS{$_}[0] }, $ip
+      if (my $ipv4 = AnyEvent::Socket::parse_ipv4 $addr) {
+         ($ipv4) = $ipv4 =~ /^(.*)$/s if AnyEvent::TAINT;
+         push @{ $HOSTS{$_}[0] }, $ipv4
             for @aliases;
-      } elsif ($ip = AnyEvent::Socket::parse_ipv6 $addr) {
-         ($ip) = $ip =~ /^(.*)$/s if AnyEvent::TAINT;
-         push @{ $HOSTS{$_}[1] }, $ip
+      } elsif (my $ipv6 = AnyEvent::Socket::parse_ipv6 $addr) {
+         ($ipv6) = $ipv6 =~ /^(.*)$/s if AnyEvent::TAINT;
+         push @{ $HOSTS{$_}[1] }, $ipv6
             for @aliases;
       }
    }
