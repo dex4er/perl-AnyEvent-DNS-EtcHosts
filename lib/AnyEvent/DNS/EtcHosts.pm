@@ -51,10 +51,11 @@ explicitly for C<resolve_sockaddr> function.
 =cut
 
 use 5.008_001;
+
 use strict;
 use warnings;
 
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 use base 'AnyEvent::DNS';
 

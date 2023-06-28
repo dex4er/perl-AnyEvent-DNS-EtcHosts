@@ -1,3 +1,7 @@
+0.0104  2023-06-29      Piotr Roszatycki <dexter@cpan.org>
+
+* Provided cpan file.
+
 0.0103  2014-07-14      Piotr Roszatycki <dexter@cpan.org>
 
 * Support AnyEvent::IO::IOAIO (the default on Fedora systems).
