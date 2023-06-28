@@ -13,10 +13,6 @@ on test => sub {
     requires 'Test::More', '0.88';
 };
 
-feature examples => sub {
-    requires 'Plack::Middleware::Proxy::Requests';
-};
-
 on develop => sub {
     requires 'Devel::Cover';
     requires 'Devel::NYTProf';
