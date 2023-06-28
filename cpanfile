@@ -1,8 +1,6 @@
 requires 'perl', '5.008001';
 
-requires 'AnyEvent', '7.0',
-
-    requires 'Plack::App::Proxy';
+requires 'AnyEvent', '7.0';
 
 on configure => sub {
     requires 'Module::Build';
